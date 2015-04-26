@@ -28,6 +28,10 @@
 
 class Tools {
 
+    // list all files of a dir....
+    // rename file
+    // delete file....
+    // change attributes of a file...
 
     /**
      * @param array $arr
