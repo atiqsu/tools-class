@@ -9,18 +9,19 @@
  * Features : Mainly static type functions
  *
  * ******** Method list *******************
- * 1. arrayToCsv
- * 2. csvToArray
- * 2. removeDoubleSpace
- * 2. removeSpace
- * 2. removeSpaceFeed
- * 2. smartClean
- * 2. replaceSpaceWithParam
- * 2. replaceParamWithParam
- * 2. dumps
- * 2. dump
- * 2. csvToArray
- *
+ * 1.  arrayToCsv
+ * 2.  csvToArray
+ * 3.  removeDoubleSpace
+ * 4.  removeSpace
+ * 5.  removeSpaceFeed
+ * 6.  smartClean
+ * 7.  replaceSpaceWithParam
+ * 8.  replaceParamWithParam
+ * 9.  dumps
+ * 10. dump
+ * 11. csvToArray
+ * 12. processKendoFilters
+ * 12. processKendoClause
  *
  */
 
@@ -32,6 +33,22 @@ class Tools {
     // rename file
     // delete file....
     // change attributes of a file...
+    // raw function need to edit for fit in this class
+
+    // for ftp class : ftp_mkdir , ftp_chdir, ftp_rmdir, ftp_delete, ftp_cdup
+    // why not a class fileManager!
+
+    function check_for_directory()
+    {
+        //use real_path function
+        if (!file_exists($this->directory_name))
+        {
+            mkdir($this->directory_name,0777);
+        }
+        @chmod($this->directory_name,0777);
+    }
+
+    // end of raw functions
 
     /**
      * @param array $arr
@@ -189,6 +206,54 @@ class Tools {
         }
         return false;
     }
+
+    /**
+     * todo - need to improve
+     * @param $arrFilter
+     * @return string
+     */
+    function processKendoFilters($arrFilter){
+        $logic= strtolower($arrFilter['logic']);
+        $clause=' ';
+        switch($logic){
+
+            case 'and':
+                $clause .= self:: processKendoClause($arrFilter['filters']);
+                break;
+            default :
+                die('something wrong happened!');
+        }
+        return $clause ;
+    }
+
+    /**
+     * todo - need to improve
+     * @param $filters
+     * @param string $logic
+     * @return string
+     */
+    function processKendoClause($filters, $logic='AND'){
+
+        $separator ='';
+        $clause = '';
+        foreach($filters as $flt){
+            switch($flt['operator']){
+                case 'contains': $clause .= $separator."$flt[field] LIKE '%$flt[value]%'"; break;
+                case 'doesnotcontain': $clause .= $separator."$flt[field] NOT LIKE '%$flt[value]%'"; break;
+                case 'startswith': $clause .= $separator."$flt[field] LIKE '$flt[value]%'"; break;
+                case 'endswith': $clause .= $separator."$flt[field] LIKE '%$flt[value]'"; break;
+
+                case 'eq': $clause .= $separator."$flt[field] = '$flt[value]'"; break;
+                case 'gte': $clause .= $separator."$flt[field] >= '$flt[value]'"; break;
+                case 'lt': $clause .= $separator."$flt[field] < '$flt[value]'"; break;
+                case 'lte': $clause .= $separator."$flt[field] <= '$flt[value]'"; break;
+                case 'neq': $clause .= $separator."$flt[field] != '$flt[value]'"; break;
+            }
+            $separator = " $logic ";
+        }
+        return $clause;
+    }
+
 }
 
 
