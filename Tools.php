@@ -21,7 +21,11 @@
  * 10. dump
  * 11. csvToArray
  * 12. processKendoFilters
- * 12. processKendoClause
+ * 13. processKendoClause
+ * 14. camelCaseToFlat
+ * 15. flatToCamelCase
+ * 16. average
+ * 17. sum
  *
  */
 
@@ -48,7 +52,58 @@ class Tools {
         @chmod($this->directory_name,0777);
     }
 
-    // end of raw functions
+
+    // end of raw functions...............................
+
+
+    /**
+     * Calculate sum of given numbers
+     * Example : sum(3,2,1); sum(false,array(),5,5); // will return 10
+     * @return int|string
+     */
+    public static function sum(){
+        $s=0;
+        foreach(func_get_args() as $a) $s+= is_numeric($a)? $a: 0;
+        return $s;
+    }
+
+    /**
+     * Calculates average of some given number
+     * Example : average(10, 15, 20, 25);
+     * @return float
+     */
+    public static function average(){
+        return array_sum(func_get_args())/func_num_args();
+    }
+
+    /**
+     * For more perfect case conversion see below
+     * http://framework.zend.com/manual/2.2/en/modules/zend.filter.word.html
+     * @param array $input
+     * @param string $sap
+     * @return string
+     */
+    public static function flatToCamelCase($input=array(), $sap='_'){
+        $ret = explode($sap, $input);
+        $output='';
+        foreach($ret as $rt) $output.= ucfirst($rt);
+        return $output;
+    }
+
+    /**
+     * @param $string
+     * @param string $sap
+     * @return string
+     */
+    public static function camelCaseToFlat($string, $sap='_'){
+
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode($sap, $ret);
+    }
 
     /**
      * @param array $arr
