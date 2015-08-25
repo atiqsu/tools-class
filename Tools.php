@@ -52,7 +52,72 @@ class Tools {
         @chmod($this->directory_name,0777);
     }
 
+    function listChr(){
+        for ($i = 0; $i < 256; ++$i) {
+            static $genNum;
+            $genNum++;
+            echo "chr($genNum) will output '";
+            echo (chr($genNum));
+            echo "'< br>\n";
+        }
+    }
+    function Encode($txtData,$Level){
+        for ($j = 0;$j<$Level;$j++){
+            $tmpStr = '';
+            for ($i = 0;$i<strlen($txtData);$i++)
+                $tmpStr .= ord(substr(strtoupper($txtData), $i, 1));
+            $txtData = $tmpStr;
+        }
+        return (strlen($Level)).$Level.$txtData;
+    }
 
+    function Decode($txtData){
+        $intLevel = substr($txtData, 1, substr($txtData, 0, 1));
+        $startStr = substr($txtData, substr($txtData, 0, 1)+1, strlen($txtData));
+        for ($j = 0;$j<$intLevel;$j++){
+            for ($i = 0;$i<strlen($startStr);$i+=2)
+                $tmpStr .= chr(intval(substr($startStr, $i, 2)));
+            $startStr = $tmpStr;
+
+            $tmpStr = "";
+        }
+        return $startStr;
+    }
+
+    function ascii2str($str) {
+        $arr=array(
+            "&#32;"=>' ', "&#33;"=>'!', "&#34;"=>'"', "&#35;"=>'#', "&#36;"=>'$',
+            "&#37;"=>'%', "&#38;"=>'&', "&#39;"=>"'", "&#40;"=>'(', "&#41;"=>')',
+            "&#42;"=>'*', "&#43;"=>'+', "&#44;"=>',', "&#45;"=>'-', "&#46;"=>'.',
+            "&#47;"=>'/', "&#48;"=>'0', "&#49;"=>'1', "&#50;"=>'2', "&#51;"=>'3',
+            "&#52;"=>'4', "&#53;"=>'5', "&#54;"=>'6', "&#55;"=>'7', "&#56;"=>'8',
+            "&#57;"=>'9', "&#58;"=>':', "&#59;"=>';', "&#60;"=>'<', "&#61;"=>'=',
+            "&#62;"=>'>', "&#63;"=>'?', "&#64;"=>'@', "&#65;"=>'A', "&#66;"=>'B',
+            "&#67;"=>'C', "&#68;"=>'D', "&#69;"=>'E', "&#70;"=>'F', "&#71;"=>'G',
+            "&#72;"=>'H', "&#73;"=>'I', "&#74;"=>'J', "&#75;"=>'K', "&#76;"=>'L',
+            "&#77;"=>'M', "&#78;"=>'N', "&#79;"=>'O', "&#80;"=>'P', "&#81;"=>'Q',
+            "&#82;"=>'R', "&#83;"=>'S', "&#84;"=>'T', "&#85;"=>'U', "&#86;"=>'V',
+            "&#87;"=>'W', "&#88;"=>'X', "&#89;"=>'Y', "&#90;"=>'Z', "&#91;"=>'[',
+            "&#92;"=>'\\', "&#93;"=>']', "&#94;"=>'^', "&#95;"=>'_', "&#96;"=>'`',
+            "&#97;"=>'a', "&#98;"=>'b', "&#99;"=>'c', "&#100;"=>'d', "&#101;"=>'e',
+            "&#102;"=>'f', "&#103;"=>'g', "&#104;"=>'h', "&#105;"=>'i', "&#106;"=>'j',
+            "&#107;"=>'k', "&#108;"=>'l', "&#109;"=>'m', "&#110;"=>'n', "&#111;"=>'o',
+            "&#112;"=>'p', "&#113;"=>'q', "&#114;"=>'r', "&#115;"=>'s', "&#116;"=>'t',
+            "&#117;"=>'u', "&#118;"=>'v', "&#119;"=>'w', "&#120;"=>'x', "&#121;"=>'y',
+            "&#122;"=>'z', "&#123;"=>'{', "&#124;"=>'|', "&#125;"=>'}', "&#126;"=>'~'
+        );
+        return strtr($str,$arr);
+    }
+
+    function utfCharToNumber($char) {
+        $i = 0;
+        $number = '';
+        while (isset($char{$i})) {
+            $number.= ord($char{$i});
+            ++$i;
+        }
+        return $number;
+    }
     // end of raw functions...............................
 
 
@@ -237,6 +302,18 @@ class Tools {
         echo '</pre>';
         if($die==='comment') echo '-->';
         if($die===true)	die('Died from dump helper...'.$die_msg);
+    }
+
+    /**
+     * @author  Md. Atiqur Rahman
+     * @param $var
+     * @param bool $die
+     * @param null $die_msg
+     */
+    public static function dumpInPre($var, $die=false, $die_msg=NULL){
+
+        echo '<pre>'.$var.'</pre>';
+        if($die===true)	die('Died from dumper'.$die_msg);
     }
 
     /**
