@@ -118,8 +118,46 @@ class Tools {
         }
         return $number;
     }
-    // end of raw functions...............................
 
+    //echo Encode('123',4).'<br>';
+    //echo Decode(Encode('123',5));
+
+    // end of raw functions...............................
+    //==============================================================================================
+
+    /**
+     * Get intersecting as wel as subtracting element of two array
+     * @author  Md. Atiqur Rahman
+     * @param $arr1
+     * @param $arr2
+     * @return array
+     */
+    public function arrayCompare($arr1, $arr2){
+
+        $ret =array();
+        $ret['count']['arr1']=count($arr1);
+        $ret['count']['arr2']=count($arr2);
+        $ret['unique']['arr1']=array_diff($arr1, $arr2);
+        $ret['unique']['arr2']=array_diff($arr2, $arr1);
+        $ret['given']['arr1']=$arr1;
+        $ret['given']['arr2']=$arr2;
+
+        if(count($ret['unique']['arr1'])>0){
+
+            foreach($ret['unique']['arr1'] as $key=>$val){
+
+                unset($arr1[$key]);
+
+            }
+            $ret['unique']['common']= $arr1;
+        }
+        else $ret['unique']['common']= $ret['given']['arr1'];
+
+        $ret['count']['common']=count($ret['unique']['common']);
+
+        return $ret;
+
+    }
 
     /**
      * Calculate sum of given numbers
@@ -148,7 +186,7 @@ class Tools {
      * @param string $sap
      * @return string
      */
-    public static function flatToCamelCase($input=array(), $sap='_'){
+    public static function flatToCamelCase($input='', $sap='_'){
         $ret = explode($sap, $input);
         $output='';
         foreach($ret as $rt) $output.= ucfirst($rt);
@@ -281,6 +319,26 @@ class Tools {
         if($die===true)	die('Died from dumps helper...');
     }
 
+    /**
+     * @author  Md. Atiqur Rahman
+     * @param string $var
+     */
+    public function println($var =''){
+
+        echo $var.'<br/>';
+    }
+
+    /**
+     * @author  Md. Atiqur Rahman
+     * @param $var
+     * @param bool $die
+     * @param null $die_msg
+     */
+    public static function dumpInPre($var, $die=false, $die_msg=NULL){
+
+        echo '<pre>'.$var.'</pre>';
+        if($die===true)	die('Died from dumper'.$die_msg);
+    }
 
     /**
      * Dumping variable for debugging
@@ -302,18 +360,6 @@ class Tools {
         echo '</pre>';
         if($die==='comment') echo '-->';
         if($die===true)	die('Died from dump helper...'.$die_msg);
-    }
-
-    /**
-     * @author  Md. Atiqur Rahman
-     * @param $var
-     * @param bool $die
-     * @param null $die_msg
-     */
-    public static function dumpInPre($var, $die=false, $die_msg=NULL){
-
-        echo '<pre>'.$var.'</pre>';
-        if($die===true)	die('Died from dumper'.$die_msg);
     }
 
     /**
