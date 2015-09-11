@@ -42,6 +42,8 @@ class Tools {
     // for ftp class : ftp_mkdir , ftp_chdir, ftp_rmdir, ftp_delete, ftp_cdup
     // why not a class fileManager!
 
+
+
     function check_for_directory()
     {
         //use real_path function
@@ -61,6 +63,7 @@ class Tools {
             echo "'< br>\n";
         }
     }
+
     function Encode($txtData,$Level){
         for ($j = 0;$j<$Level;$j++){
             $tmpStr = '';
@@ -121,9 +124,356 @@ class Tools {
 
     //echo Encode('123',4).'<br>';
     //echo Decode(Encode('123',5));
+    function getDirectorySize($directory){
+
+        $dirSize=0;
+
+        if(!$dh=opendir($directory))
+        {
+            return false;
+        }
+
+        while($file = readdir($dh))
+        {
+            if($file == "." || $file == "..")
+            {
+                continue;
+            }
+
+            if(is_file($directory."/".$file))
+            {
+                $dirSize += filesize($directory."/".$file);
+            }
+
+            if(is_dir($directory."/".$file))
+            {
+                $dirSize += getDirectorySize($directory."/".$file);
+            }
+        }
+
+        closedir($dh);
+
+        return $dirSize;
+    }
+
+    function count_dir_files($dirname){
+        $total_files=0;
+        if(is_dir($dirname))
+        {
+            $dp=opendir($dirname);
+            if($dp)
+            {
+                while(($filename=readdir($dp)) == true)
+                {
+                    if(($filename !=".") && ($filename !=".."))
+                    {
+                        $total_files++;
+                    }
+                }
+            }
+        }
+        return $total_files;
+    }
+
+    function url_exists($url)
+    {
+        if((strpos($url, "http")) === false)
+        {
+            $url = "http://" . $url;
+        }
+        @$a=get_headers($url);
+
+        if (is_array($a))
+        {
+            $status=$a[0];
+            $statusArr=explode(" ",$status);
+            $statusCode=$statusArr[1];
+            if(intval($statusCode==200))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+
+    function scanDirectories($rootDir, $allowext, $allData=array()) {
+        $dirContent = scandir($rootDir);
+        foreach($dirContent as $key => $content) {
+            $path = $rootDir.'/'.$content;
+            $ext = substr($content, strrpos($content, '.') + 1);
+
+            if(in_array($ext, $allowext)) {
+                if(is_file($path) && is_readable($path)) {
+                    $allData[] = $path;
+                }elseif(is_dir($path) && is_readable($path)) {
+                    // recursive callback to open new directory
+                    $allData = scanDirectories($path, $allData);
+                }
+            }
+        }
+        return $allData;
+    }
+    /*
+     *  $rootDir = "www";
+$allowext = array("zip","rar","html");
+$files_array = scanDirectories($rootDir,$allowext);
+print_r($files_array);
+     */
+
+
+    //NNNIIIinnnjaaa::
+//array of files without directories... optionally filtered by extension
+    function file_list($d,$x){
+        foreach(array_diff(scandir($d),array('.','..')) as $f)
+            if(is_file($d.'/'.$f)&&(($x)?ereg($x.'$',$f):1))
+                $l[]=$f;
+
+        return $l;
+    }
+
+//NNNIIIinnnjaaa::
+//array of directories
+    function dir_list($d){
+        foreach(array_diff(scandir($d),array('.','..')) as $f)if(is_dir($d.'/'.$f))$l[]=$f;
+        return $l;
+    }
+
+
+    function find_all_files($dir)
+    {
+        $root = scandir($dir);
+        foreach($root as $value)
+        {
+            if($value === '.' || $value === '..') {continue;}
+            if(is_file("$dir/$value")) {$result[]="$dir/$value";continue;}
+            foreach(find_all_files("$dir/$value") as $value)
+            {
+                $result[]=$value;
+            }
+        }
+        return $result;
+    }
+
+    function findFiles($directory, $extensions = array()) {
+        function glob_recursive($directory, &$directories = array()) {
+            foreach(glob($directory, GLOB_ONLYDIR | GLOB_NOSORT) as $folder) {
+                $directories[] = $folder;
+                glob_recursive("{$folder}/*", $directories);
+            }
+        }
+        glob_recursive($directory, $directories);
+        $files = array ();
+        foreach($directories as $directory) {
+            foreach($extensions as $extension) {
+                foreach(glob("{$directory}/*.{$extension}") as $file) {
+                    $files[$extension][] = $file;
+                }
+            }
+        }
+        return $files;
+    }
+
+    function makedirs($dirpath, $mode=0777) {
+        return is_dir($dirpath) || mkdir($dirpath, $mode, true);
+    }
 
     // end of raw functions...............................
     //==============================================================================================
+
+
+    /**
+     * Lists files recursively.
+     * @author Md. Atiqur Rahman.
+     * @param $directory
+     * @return array
+     */
+    function listFilesAndDir($directory){
+
+        $return = array();
+        $dKey = end(explode('/',$directory));
+        $lst = $this->countDirFiles($directory);
+
+        if($lst['total'] ==0 ){
+
+            if($lst['status']=='error')  $return[$dKey] = '__EmptyDirectory! - '.$lst['msg'];
+            else $return[$dKey][] = '__EmptyDirectory!';
+
+        }else{
+
+            if($lst['totalFiles']>0){
+                foreach($lst['filesNames'] as $file){
+                    $return[$dKey][] = $file;
+                }
+            }
+
+            if($lst['totalDir']>0){
+
+                foreach($lst['dirNames'] as $dir){
+                    $sub = $this->listFilesAndDir($directory.'/'.$dir);
+                    $return[$dKey][$dir] = $sub[$dir];
+                }
+            }
+        }
+
+        return $return;
+
+    }
+
+    /**
+     * Scanning directory recursive.
+     * @author copiedFrom php.org
+     * @param $dir
+     * @return array
+     */
+    function dirToArray($dir) {
+
+        $result = array();
+        $cDir = scandir($dir);
+        foreach ($cDir as $key => $value)
+        {
+            if (!in_array($value,array(".","..")))
+            {
+                if (is_dir($dir . DIRECTORY_SEPARATOR . $value)){
+
+                    $result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value);
+                }
+                else
+                {
+                    $result[] = $value;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Count files and file name.
+     * @param $directory
+     * @param bool $returnFileName
+     * @return array
+     */
+    function countDirFiles($directory, $returnFileName = true){
+
+        $total=0;
+        $totalFiles=0;
+        $totalDir=0;
+        $return = array();
+
+        if(is_dir($directory))
+        {
+            $dp=opendir($directory);
+            if($dp)
+            {
+                while(($filename=readdir($dp)) == true)
+                {
+                    if(($filename !=".") && ($filename !=".."))
+                    {
+                        $return['scanned'][] = $filename;
+                        if(is_file($directory.'/'.$filename)){
+
+                            $totalFiles++;
+                            $return['filesNames'][]= $filename;
+                        }
+                        else{
+
+                            $totalDir++;
+                            $return['dirNames'][]= $filename;
+                        }
+                        $total++;
+                    }
+                }
+                $return['totalFiles'] = $totalFiles;
+                $return['totalDir'] = $totalDir;
+                $return['total'] = $total;
+                $return['status'] = 'ok';
+
+            }else{
+                $return['totalFiles'] = $totalFiles;
+                $return['totalDir'] = $totalDir;
+                $return['total'] = $total;
+                $return['msg'] = 'Inaccessible directory.';
+                $return['status'] = 'error';
+            }
+        }else{
+            $return['totalFiles'] = $totalFiles;
+            $return['total'] = $total;
+            $return['msg'] = 'Directory does not exist.';
+            $return['status'] = 'error';
+        }
+
+        if($returnFileName===true) unset($return['scanned']);
+        return $return;
+    }
+    /**
+     * Delete a directory
+     * @param $directory - directory to be deleted.
+     * @param bool $deleteNonEmptyDir - flag for force delete of non empty directory.
+     * @return bool | string
+     */
+    function deleteDirectory($directory, $deleteNonEmptyDir = false){
+
+        if (!is_dir($directory)){
+
+            return "Directory doesn't exist.";
+        }
+
+        $list = scandir($directory);
+
+        if(count($list)>2){
+
+            if($deleteNonEmptyDir!==true)   return 'Non empty directory.';
+
+            if(!$dh=opendir($directory))
+            {
+                return "Inaccessible directory.!";
+            }
+
+            while($file=readdir($dh))
+            {
+                if($file == "." || $file == "..")
+                {
+                    continue;
+                }
+
+                if(is_dir($directory."/".$file))
+                {
+                    $this->deleteDirectory($directory."/".$file, $deleteNonEmptyDir);
+                }
+
+                if(is_file($directory."/".$file))
+                {
+                    unlink($directory."/".$file);
+                }
+            }
+            closedir($dh);
+        }
+
+        return rmdir($directory);
+    }
+
+    /**
+     * Check if directory exist, if not exist create the directory
+     * @param $dir
+     * @param bool $forceCreate
+     * @param bool $recursive
+     * @param int $mode
+     * @return bool
+     */
+    function checkForDirectory($dir, $forceCreate=true, $recursive = false, $mode = 0777){
+        if (!file_exists($dir))
+        {
+            if($forceCreate){
+                return mkdir($dir, $mode, $recursive);
+            }
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Get intersecting as wel as subtracting element of two array
