@@ -5,8 +5,12 @@
  * Skype: atiq.cu
  * Date: 4/22/2015
  * Time: 8:25 PM
- * Last Modified : 24th April 2015
  * Features : Mainly static type functions
+ *
+ * *********Modification log***************
+ *
+ * Last Modified : 3rd December 2015
+ * Last Modified : 24th April 2015
  *
  * ******** Method list *******************
  * 1.  arrayToCsv
@@ -31,18 +35,463 @@
 
 
 
+/**
+ * Class Tools
+ * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+ * @version 1.0.5
+ */
 class Tools {
 
-    // list all files of a dir....
-    // rename file
-    // delete file....
-    // change attributes of a file...
-    // raw function need to edit for fit in this class
+    ## worked in local environment........ please raise issue in git if you find any issue.
 
-    // for ftp class : ftp_mkdir , ftp_chdir, ftp_rmdir, ftp_delete, ftp_cdup
-    // why not a class fileManager!
+    /**
+     * Create simple numeric patterned sting.
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.1
+     * @param $FirstPart
+     * @param $lastPart
+     * @param int $varUpTo
+     * @param int $varStart
+     * @param string $append
+     * @param string $prepend
+     * @param int $step
+     * @return array
+     */
+    function getSlideShareLinks($FirstPart, $lastPart, $varUpTo = 30, $varStart = 1, $append='', $prepend ='', $step=1){
+
+        $return = array();
+
+        for($i = $varStart ; $i<$varUpTo ; $i= $i+$step){
+            $tmp = $prepend.$FirstPart.$i.$lastPart.$append ;
+            $return[] = $tmp ;
+        }
+
+        return $return ;
+    }
+
+    /**
+     * Creating image tag from a source array.
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.1
+     * @param array $arr
+     * @param bool $addTitle
+     * @param bool $returnOutput
+     * @return array|string
+     */
+    function makeImageTagFromArray(array $arr, $addTitle = true, $returnOutput = false){
+
+        $i=1;
+        $buffer = '';
+        $bufferArray = array();
+
+        if($addTitle){
+            foreach($arr as $imSrc){
+                $bufferArray[] = '<img src="'.$imSrc.'" title = "Slide no:'.($i++).'"/>';
+                $buffer .= '<img src="'.$imSrc.'" title = "Slide no:'.($i++).'"/>';
+
+            }
+
+        }else{
+            foreach($arr as $imSrc){
+                $bufferArray[] = '<img src="'.$imSrc.'" />';
+                $buffer .= '<img src="'.$imSrc.'" />';
+            }
+        }
+
+        if(!$returnOutput){
+            echo $buffer;
+        }
+
+        return $bufferArray;
+    }
 
 
+    /**
+     * Get intersecting as wel as subtracting element of two array
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param $arr1
+     * @param $arr2
+     * @return array
+     */
+    public function arrayCompare($arr1, $arr2){
+
+        $ret =array();
+        $ret['count']['arr1']=count($arr1);
+        $ret['count']['arr2']=count($arr2);
+        $ret['unique']['arr1']=array_diff($arr1, $arr2);
+        $ret['unique']['arr2']=array_diff($arr2, $arr1);
+        $ret['given']['arr1']=$arr1;
+        $ret['given']['arr2']=$arr2;
+
+        if(count($ret['unique']['arr1'])>0){
+
+            foreach($ret['unique']['arr1'] as $key=>$val){
+
+                unset($arr1[$key]);
+
+            }
+            $ret['unique']['common']= $arr1;
+        }
+        else $ret['unique']['common']= $ret['given']['arr1'];
+
+        $ret['count']['common']=count($ret['unique']['common']);
+
+        return $ret;
+
+    }
+
+
+    /**
+     * Calculate sum of given numbers
+     * Example : sum(3,2,1); sum(false,array(),5,5); // will return 10
+     * @return int|string
+     */
+    public static function sum(){
+        $s=0;
+        foreach(func_get_args() as $a) $s+= is_numeric($a)? $a: 0;
+        return $s;
+    }
+
+
+    /**
+     * Calculates average of some given number
+     * Example : average(10, 15, 20, 25);
+     * @return float
+     */
+    public static function average(){
+        return array_sum(func_get_args())/func_num_args();
+    }
+
+
+    /**
+     * Flat to camel case word : atiqur_rahman : atiqurRahman
+     * For more perfect case conversion see below
+     * http://framework.zend.com/manual/2.2/en/modules/zend.filter.word.html
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param string $input
+     * @param string $sap
+     * @return string
+     */
+    public static function flatToCamelCase($input='', $sap='_'){
+        $ret = explode($sap, $input);
+        $output='';
+        foreach($ret as $rt) $output.= ucfirst($rt);
+        return lcfirst($output);
+    }
+
+
+    /**
+     * Flat to studly case word
+     * @usage flatToStudlyCase('atiqur_rahman') -> AtiqurRahman
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param string $input
+     * @param string $sap
+     * @return string
+     */
+    public static function flatToStudlyCase($input='', $sap='_'){
+        $ret = explode($sap, $input);
+        $output='';
+        foreach($ret as $rt) $output.= ucfirst($rt);
+        return $output;
+    }
+
+
+    /**
+     * Camel/studly case to flat
+     * @usage - camelCaseToFlat('atiqurRahman' , ' ') = atiqur rahman
+     * @param $string
+     * @param string $sap
+     * @return string
+     */
+    public static function camelCaseToFlat($string, $sap='_'){
+
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode($sap, $ret);
+    }
+
+
+    /**
+     * Convert array into comma separated value (csv)
+     * @param array $arr
+     * @param string $separator - default is ', ' (comma+space)
+     * @return string
+     */
+    public static function arrayToCsv($arr=array(), $separator=', '){
+
+        if(is_array($arr) and count($arr)>0){
+            $sap='';
+            $return='';
+            foreach($arr as $r){
+                $return.=$sap.$r;
+                $sap=$separator;
+            }
+            return $return;
+
+        }else return '';
+    }
+
+    /**
+     * Convert Csv[comma separated value] into array.
+     * @param string $str
+     * @param string $sap - default is ', ' (comma+space)
+     * @return array
+     */
+    public static function csvToArray($str='', $sap=', '){
+
+        if(strlen($str)>0){
+            $return = explode($sap, $str);
+            return $return;
+
+        }else return array();
+    }
+
+
+    /**
+     * Remove double space from string. optionally can replace every double space with something else.
+     * @param null $string
+     * @param string $rep
+     * @return mixed
+     */
+    public static function removeDoubleSpace($string = null, $rep=' '){
+        return  $ret = preg_replace('/([\s])\1+/', $rep, $string);
+    }
+
+    /**
+     * Remove/replace space from a string.
+     * @param null $string
+     * @param string $rep
+     * @return mixed
+     */
+    public static function removeSpace($string = null, $rep=''){
+        return $ret = preg_replace('/[\s]+/', $rep, $string );
+    }
+
+    /**
+     * Remove/replace space feed from a string.
+     * @param null $s
+     * @param string $rep
+     * @return mixed
+     */
+    public static function removeSpaceFeed( $s = null, $rep=''){
+        return $ret = preg_replace('/[\t\n\r\0\x0B]/', $rep, $s);
+    }
+
+    /**
+     * First remove space feed then remove every double space then trim the string.
+     * @param null $s
+     * @return string
+     */
+    public static function smartClean($s = null){
+        return $ret = trim( self::removeDoubleSpace( self::removeSpaceFeed($s) ) );
+    }
+
+    /**
+     * Remove space feed then replace space with given parameter.
+     * @param null $string
+     * @param string $rep
+     * @return mixed
+     */
+    public static function replaceSpaceWithParam($string = null, $rep='_'){
+        $ret = trim(self::removeSpaceFeed($string));
+        return self::replaceParamWithParam($ret, ' ', $rep);
+    }
+
+    /**
+     * alias of str_replace - but modified for default replace string is space.
+     * @param $string
+     * @param $replace
+     * @param string $with
+     * @return mixed
+     */
+    public static function replaceParamWithParam($string, $replace, $with=' '){
+        return str_replace($replace, $with, $string);
+    }
+
+
+    /**
+     * Dumping variable for debugging
+     * @param $var
+     * @param bool $die
+     * @param null $die_msg
+     * @param bool $varDump
+     */
+    public static function dump($var, $die=true, $die_msg=NULL, $varDump=false){
+
+        if('comment'===$die){   echo '<!-- ';}
+        echo '<pre>';
+
+        if($varDump===true)  var_dump($var);
+        elseif(is_array($var) && count($var)>0) print_r($var);
+        elseif(is_object($var)) print_r($var);
+        else var_dump($var);
+
+        echo '</pre>';
+        if($die==='comment') echo '-->';
+        if($die===true)	die('Died from dump helper...'.$die_msg);
+    }
+
+
+    /**
+     * dumping variables passed as arguments of this function.
+     * @param bool $die
+     */
+    public static function dumps($die=true){
+        echo '<pre>';
+        $args = func_get_args();
+        foreach ($args as $arg){
+            if(is_array($arg) && count($arg)>0) print_r($arg);
+            elseif(is_object($arg)) print_r($arg);
+            else var_dump($arg);
+
+        }
+        echo "</pre>";
+        if($die===true)	die('Died from dumps helper...');
+    }
+
+    /**
+     * Printing line break
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param bool $eol
+     * @param string $var
+     * @param string $br
+     * @return void
+     */
+    public static function println($eol = false, $var ='', $br = '<br/>'){
+        if($eol)       echo $var.PHP_EOL;
+        else      echo $var.$br;
+    }
+
+
+    /**
+     * Dump string in pre tag.
+     * @author  Md. Atiqur Rahman
+     * @param $var
+     * @param bool $die
+     * @param null $die_msg
+     */
+    public static function dumpInPre($var, $die=false, $die_msg=NULL){
+
+        echo '<pre>'.$var.'</pre>';
+        if($die===true)	die('Died from dumper'.$die_msg);
+    }
+
+    /**
+     * Alias of dumpInPre
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param $var
+     * @param bool $die
+     * @param null $die_msg
+     * @return void
+     */
+    public static function printInPre($var, $die=false, $die_msg=NULL){
+        Tools::dumpInPre($var, $die, $die_msg);
+    }
+
+
+    /**
+     * @param $conf - An associative array with value as Index/key and label text as array value $arr['car']= 'Select Car'
+     * @param $elementName  - name of the select element
+     * @param string $selected  - any item should be selected when created pass the value here createSelectBox($arr, 'trans', 'car', , 'class="primary"');
+     * @param null $elementId
+     * @param null $attributes - extra attributes like class , style etc.
+     * @return bool|string
+     */
+    public static function createSelectBox($conf, $elementName, $selected='', $elementId=NULL, $attributes=NULL){
+
+        if(is_array($conf)){
+            $return='<select name="'.$elementName.'" size="1" '.(NULL!=$elementId?' id="'.$elementId.'" ':'').$attributes.' >';
+            foreach($conf as $value=>$labelText){
+                $return.='<option value="'.$value.'" ';
+                if($value== $selected) $return.=' selected ';
+                $return.=' >'.$labelText.'</option>';
+            }
+            $return.='</select>';
+            return $return;
+        }
+        return false;
+    }
+
+    /**
+     * For echoing output...
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param $array
+     * @param $extraHtmlSeparator
+     * @return void
+     */
+    public function mapArray($array, $extraHtmlSeparator=''){
+
+        if(is_array($array)){
+
+            foreach($array as $val){
+                echo $val.$extraHtmlSeparator ;
+            }
+        }else{
+            echo $array.$extraHtmlSeparator ;
+        }
+    }
+
+    /**
+     * Find available methods on object of class
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param $object
+     * @param bool $die
+     * @return void
+     */
+    public function getMethodList($object, $die=false){
+
+        if(is_object($object)){
+
+            $list= get_class_methods($object);
+            sort($list);
+            echo '<pre>'; print_r($list); echo '</pre>';
+
+        }else{
+            echo 'is not a object. -its '.gettype($object);
+        }
+
+        if($die) die('died from method helper......');
+    }
+
+    /**
+     * Alias of getMethodList
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.0
+     * @param $object
+     * @param bool $die
+     * @return void
+     */
+    public function getClassMethod($object, $die=false){
+
+        $this->getMethodList($object, $die);
+    }
+
+
+    //--------------in progress work not fully tested there may be even syntax error so when use this class comment from here to end, then use the class-----------------
+
+    public function cleanString($string) {
+        $s = trim($string);
+        $s = iconv("UTF-8", "UTF-8//IGNORE", $s); // drop all non utf-8 characters
+
+        // this is some bad utf-8 byte sequence that makes mysql complain - control and formatting i think
+        $s = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/', '-', $s);
+        $s = preg_replace('/\s+/', ' ', $s); // reduce all multiple whitespace to a single space
+        return $s;
+    }
+
+
+
+    //checked and reviewed....20151203=================
 
     function check_for_directory()
     {
@@ -393,6 +842,7 @@ print_r($files_array);
     }
 
     function findFiles($directory, $extensions = array()) {
+        $directories = array();
         function glob_recursive($directory, &$directories = array()) {
             foreach(glob($directory, GLOB_ONLYDIR | GLOB_NOSORT) as $folder) {
                 $directories[] = $folder;
@@ -609,265 +1059,7 @@ print_r($files_array);
         return true;
     }
 
-    /**
-     * Get intersecting as wel as subtracting element of two array
-     * @author  Md. Atiqur Rahman
-     * @param $arr1
-     * @param $arr2
-     * @return array
-     */
-    public function arrayCompare($arr1, $arr2){
 
-        $ret =array();
-        $ret['count']['arr1']=count($arr1);
-        $ret['count']['arr2']=count($arr2);
-        $ret['unique']['arr1']=array_diff($arr1, $arr2);
-        $ret['unique']['arr2']=array_diff($arr2, $arr1);
-        $ret['given']['arr1']=$arr1;
-        $ret['given']['arr2']=$arr2;
-
-        if(count($ret['unique']['arr1'])>0){
-
-            foreach($ret['unique']['arr1'] as $key=>$val){
-
-                unset($arr1[$key]);
-
-            }
-            $ret['unique']['common']= $arr1;
-        }
-        else $ret['unique']['common']= $ret['given']['arr1'];
-
-        $ret['count']['common']=count($ret['unique']['common']);
-
-        return $ret;
-
-    }
-
-    /**
-     * Calculate sum of given numbers
-     * Example : sum(3,2,1); sum(false,array(),5,5); // will return 10
-     * @return int|string
-     */
-    public static function sum(){
-        $s=0;
-        foreach(func_get_args() as $a) $s+= is_numeric($a)? $a: 0;
-        return $s;
-    }
-
-    /**
-     * Calculates average of some given number
-     * Example : average(10, 15, 20, 25);
-     * @return float
-     */
-    public static function average(){
-        return array_sum(func_get_args())/func_num_args();
-    }
-
-    /**
-     * For more perfect case conversion see below
-     * http://framework.zend.com/manual/2.2/en/modules/zend.filter.word.html
-     * @param array $input
-     * @param string $sap
-     * @return string
-     */
-    public static function flatToCamelCase($input='', $sap='_'){
-        $ret = explode($sap, $input);
-        $output='';
-        foreach($ret as $rt) $output.= ucfirst($rt);
-        return $output;
-    }
-
-    /**
-     * @param $string
-     * @param string $sap
-     * @return string
-     */
-    public static function camelCaseToFlat($string, $sap='_'){
-
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
-        }
-        return implode($sap, $ret);
-    }
-
-    /**
-     * @param array $arr
-     * @param string $separator - default is ', ' (comma+space)
-     * @return string
-     */
-    public static function arrayToCsv($arr=array(), $separator=', '){
-
-        if(is_array($arr) and count($arr)>0){
-            $sap='';
-            $return='';
-            foreach($arr as $r){
-                $return.=$sap.$r;
-                $sap=$separator;
-            }
-            return $return;
-
-        }else return '';
-    }
-
-    /**
-     * @param string $str
-     * @param string $sap - default is ', ' (comma+space)
-     * @return array
-     */
-    public static function csvToArray($str='', $sap=', '){
-
-        if(strlen($str)>0){
-            $return = explode($sap, $str);
-            return $return;
-
-        }else return array();
-    }
-
-
-
-    //white space removing..
-
-    /**
-     * @param null $string
-     * @param string $rep
-     * @return mixed
-     */
-    public static function removeDoubleSpace($string = null, $rep=' '){
-        return  $ret = preg_replace('/([\s])\1+/', $rep, $string);
-    }
-
-    /**
-     * @param null $string
-     * @param string $rep
-     * @return mixed
-     */
-    public static function removeSpace($string = null, $rep=''){
-        return $ret = preg_replace('/[\s]+/', $rep, $string );
-    }
-
-    /**
-     * @param null $s
-     * @param string $rep
-     * @return mixed
-     */
-    public static function removeSpaceFeed( $s = null, $rep=''){
-        return $ret = preg_replace('/[\t\n\r\0\x0B]/', $rep, $s);
-    }
-
-    /**
-     * @param null $s
-     * @return string
-     */
-    public static function smartClean($s = null){
-        return $ret = trim( self::removeDoubleSpace( self::removeSpaceFeed($s) ) );
-    }
-
-    /**
-     * @param null $string
-     * @param string $rep
-     * @return mixed
-     */
-    public static function replaceSpaceWithParam($string = null, $rep='_'){
-        $ret = trim(self::removeSpaceFeed($string));
-        return self::replaceParamWithParam($ret, ' ', $rep);
-    }
-
-    /**
-     * @param $string
-     * @param $replace
-     * @param string $with
-     * @return mixed
-     */
-    public static function replaceParamWithParam($string, $replace, $with=' '){
-        return str_replace($replace, $with, $string);
-    }
-
-
-
-    /**
-     * dumping multiple vars
-     * @param bool $die
-     */
-    public static function dumps($die=true){
-        echo '<pre>';
-        $args = func_get_args();
-        foreach ($args as $arg){
-            if(is_array($arg) && count($arg)>0) print_r($arg);
-            elseif(is_object($arg)) print_r($arg);
-            else var_dump($arg);
-
-        }
-        echo "</pre>";
-        if($die===true)	die('Died from dumps helper...');
-    }
-
-    /**
-     * @author  Md. Atiqur Rahman
-     * @param string $var
-     */
-    public function println($var =''){
-
-        echo $var.'<br/>';
-    }
-
-    /**
-     * @author  Md. Atiqur Rahman
-     * @param $var
-     * @param bool $die
-     * @param null $die_msg
-     */
-    public static function dumpInPre($var, $die=false, $die_msg=NULL){
-
-        echo '<pre>'.$var.'</pre>';
-        if($die===true)	die('Died from dumper'.$die_msg);
-    }
-
-    /**
-     * Dumping variable for debugging
-     * @param $var
-     * @param bool $die
-     * @param null $die_msg
-     * @param bool $varDump
-     */
-    public static function dump($var, $die=true, $die_msg=NULL, $varDump=false){
-
-        if('comment'===$die){   echo '<!-- ';}
-        echo '<pre>';
-
-        if($varDump===true)  var_dump($var);
-        elseif(is_array($var) && count($var)>0) print_r($var);
-        elseif(is_object($var)) print_r($var);
-        else var_dump($var);
-
-        echo '</pre>';
-        if($die==='comment') echo '-->';
-        if($die===true)	die('Died from dump helper...'.$die_msg);
-    }
-
-    /**
-     * @param $conf - An associative array with value as Index/key and label text as array value $arr['car']= 'Select Car'
-     * @param $elementName  - name of the select element
-     * @param string $selected  - any item should be selected when created pass the value here createSelectBox($arr, 'trans', 'car', , 'class="primary"');
-     * @param null $elementId
-     * @param null $attributes - extra attributes like class , style etc.
-     * @return bool|string
-     */
-    public static function createSelectBox($conf, $elementName, $selected='', $elementId=NULL, $attributes=NULL){
-
-        if(is_array($conf)){
-            $return='<select name="'.$elementName.'" size="1" '.(NULL!=$elementId?' id="'.$elementId.'" ':'').$attributes.' >';
-            foreach($conf as $value=>$labelText){
-                $return.='<option value="'.$value.'" ';
-                if($value== $selected) $return.=' selected ';
-                $return.=' >'.$labelText.'</option>';
-            }
-            $return.='</select>';
-            return $return;
-        }
-        return false;
-    }
 
     /**
      * todo - need to improve
