@@ -9,10 +9,22 @@ include_once('Tools.php');
 
 $tools = new Tools();
 
+$fPart = 'http://image.slidesharecdn.com/buildingarestapiwithzendframework2-130819115233-phpapp02/95/building-a-rest-api-with-zend-framework-2-';
+$sPart = '-638.jpg?cb=1390045616';
+
+//$tools->dump($tools->getSlideShareLinks($fPart, $sPart, 65));
+
+$tools->dump($tools->flatToCamelCase('atiqur rahman', ' '), false);
+$tools->dump($tools->flatToStudlyCase('atiqur rahman', ' '), false);
+$tools->dump($tools->camelCaseToFlat('AtiqurRahman', ' '), false);
+
+$tools->dump($tools->average(5,7,8,2,5.5));
+
+
 //$tools->dump($tools->listFilesAndDir('asdf'));
 //$tools->dump($tools->listFilesAndDir('img'));
-$tools->dump($tools->dirToArray('ati'));
-$tools->dump($tools->listFilesAndDir('ati'));
+//$tools->dump($tools->dirToArray('ati'));
+//$tools->dump($tools->listFilesAndDir('ati'));
 //$tools->dump($tools->countDirFiles('ati'));
 //$tools->listFilesAndDir('ati');
 

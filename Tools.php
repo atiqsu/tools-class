@@ -45,6 +45,18 @@ class Tools {
     ## worked in local environment........ please raise issue in git if you find any issue.
 
     /**
+     * Basic and simple sanitize.
+     * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
+     * @since 1.0.5
+     * @param $data
+     * @return string
+     */
+    public function sanitizeSimple($data){
+        return htmlentities($data, ENT_QUOTES, 'UTF-8');
+    }
+
+
+    /**
      * Create simple numeric patterned sting.
      * @author Md. Atiqur Rahman <atiq.cse.cu0506.su@gmail.com>
      * @since 1.0.1
@@ -513,8 +525,8 @@ class Tools {
         }
     }
 
-    function Encode($txtData,$Level){
-        for ($j = 0;$j<$Level;$j++){
+    function Encode($txtData, $Level){
+        for ($j = 0; $j<$Level; $j++){
             $tmpStr = '';
             for ($i = 0;$i<strlen($txtData);$i++)
                 $tmpStr .= ord(substr(strtoupper($txtData), $i, 1));
